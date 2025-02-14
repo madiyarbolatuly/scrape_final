@@ -5,7 +5,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 import logging
 import re
@@ -17,6 +16,9 @@ from urllib.parse import urlparse
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
 app.config['OUTPUT_FOLDER'] = os.path.join(os.getcwd(), 'outputs')
+for folder in [app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER']]:
+    os.makedirs(folder, exist_ok=True)
+    
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 
 chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
