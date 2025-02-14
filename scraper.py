@@ -5,7 +5,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 import logging
 import re
@@ -15,22 +14,31 @@ from flask import Flask
 from urllib.parse import urlparse
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = "C:/Users/Madiyar/Desktop/GQ/scraper_final/uploads"
-app.config['OUTPUT_FOLDER'] = 'C:/Users/Madiyar/Desktop/GQ/scraper_final/outputs'
-
+app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
+app.config['OUTPUT_FOLDER'] = os.path.join(os.getcwd(), 'outputs')
+for folder in [app.config['UPLOAD_FOLDER'], app.config['OUTPUT_FOLDER']]:
+    os.makedirs(folder, exist_ok=True)
+    
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+
+chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--no-sandbox")
 
 chrome_options = Options()
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
 chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
+#chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--window-size=1920x1080")
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36")
+#chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36")
 chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})
 chrome_options.add_argument('--ignore-certificate-errors')
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+driver = webdriver.Chrome(
+    executable_path=os.environ.get("CHROMEDRIVER_PATH"),
+    options=chrome_options
+)
 
 def clean_price(price_text):    
     logging.info(f"Cleaning price: {price_text}")
