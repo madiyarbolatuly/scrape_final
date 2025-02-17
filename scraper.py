@@ -34,8 +34,9 @@ chrome_options.add_argument("--window-size=1920x1080")
 chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})
 chrome_options.add_argument('--ignore-certificate-errors')
 
+service = Service(executable_path='/usr/local/bin/chromedriver')
 driver = webdriver.Chrome(
-    executable_path=os.environ.get("CHROMEDRIVER_PATH"),
+    service=service,
     options=chrome_options
 )
 
