@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from webdriver_manager.chrome import ChromeDriverManager
 import pandas as pd
 import logging
 import re
@@ -34,7 +35,7 @@ chrome_options.add_argument("--window-size=1920x1080")
 chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})
 chrome_options.add_argument('--ignore-certificate-errors')
 
-service = Service(executable_path='/usr/local/bin/chromedriver')
+service = Service(executable_path=ChromeDriverManager().install())
 driver = webdriver.Chrome(
     service=service,
     options=chrome_options
