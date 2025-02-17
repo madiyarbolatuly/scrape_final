@@ -52,4 +52,5 @@ def handle_search_artikul(data):
     emit('search_results', results)
 
 if __name__ == '__main__':
-    socketio.run(app)
+    app.run(host="0.0.0.0", port=80)
+
