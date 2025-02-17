@@ -1,8 +1,9 @@
 # filepath: /C:/Users/Madiyar/Desktop/GQ/scraper_final/scraper_final/src/app.py
 from flask import Flask, render_template, request, send_file, jsonify
 from flask_socketio import SocketIO, emit
-import os
+from api.application import create_app
 from scraper import main, scrape_prices, target_urls 
+import os
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -52,5 +53,8 @@ def handle_search_artikul(data):
     emit('search_results', results)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)
+    create_app = create_app()
+    create_app.run()
+else:
+    gunicorn_app = create_app()
 
