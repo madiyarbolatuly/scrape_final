@@ -1,4 +1,4 @@
-from selenium import webdriver
+from selenium import webdriver 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -28,10 +28,7 @@ chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-gpu")
-chrome_options.add_argument("--no-sandbox")
-#chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--window-size=1920x1080")
-#chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36")
 chrome_options.add_experimental_option("prefs", {"profile.managed_default_content_settings.images": 2})
 chrome_options.add_argument('--ignore-certificate-errors')
 
@@ -63,9 +60,6 @@ def get_selectors(target_url):
         'intant.kz': ((By.CLASS_NAME, 'product_card__block_item_inner'), (By.CLASS_NAME, 'product-card-inner__new-price')),
         'elcentre.kz': ((By.CLASS_NAME, 'b-product-gallery'), (By.XPATH, "//span[@class='b-product-gallery__current-price']")),        
         'albion-group.kz': ((By.CLASS_NAME, 'cs-product-gallery'), (By.CSS_SELECTOR, "span.cs-goods-price__value.cs-goods-price__value_type_current")),
-        #'barlau.kz': ((By.XPATH, "//div[@data-role='items']"), (By.XPATH, "//span[@data-role='item.price.discount']")),
-        #'chipdip.kz': ((By.XPATH, '//*[@id="itemlist"]/tbody'), (By.XPATH, '/html/body/main/div/article[2]/div/section/ul/li[1]/div/div[2]/div[3]/span')),
-        #'legrand24.kz': ((By.CLASS_NAME, 'summary entry-summary"'), (By.CLASS_NAME, 'woocommerce-Price-amount amount"'))
     }
     for key in selectors:
         if key in target_url:
@@ -88,13 +82,6 @@ def scrape_prices(target_url, query):
 
         for product in products:
             try:
-                #product_link = product.find_element(By.TAG_NAME, 'a').get_attribute('href')
-                #if product_link:
-                    #logging.info(f"Navigating to product link: {product_link}")
-                    #driver.get(product_link)
-                    #time.sleep(2)
-                    #price_text = driver.find_element(*price_selector).text
-                #else:
                 price_text = product.find_element(*price_selector).text
                 cleaned_price = clean_price(price_text)
                 product_prices.append(cleaned_price)
@@ -113,7 +100,6 @@ def merge_excel_files(parsing_file, scraped_data, output_file, target_urls):
     logging.info(f"Merging Excel files: {parsing_file} with scraped data")
     with pd.ExcelWriter(output_file, engine='xlsxwriter') as writer:
         dfs = pd.read_excel(parsing_file, sheet_name=None)
-        
         for sheet_name, df in dfs.items():
             df.to_excel(writer, sheet_name=sheet_name, index=False)
             if sheet_name in scraped_data:
@@ -124,7 +110,8 @@ def merge_excel_files(parsing_file, scraped_data, output_file, target_urls):
 
 def main():
     logging.info("Starting main function")
-    dfs = pd.read_excel(os.path.join(app.config['UPLOAD_FOLDER'], 'test.xlsx'), sheet_name=None)
+    excel_path = os.path.join(app.config['UPLOAD_FOLDER'], 'test.xlsx')
+    dfs = pd.read_excel(excel_path, sheet_name=None)
     logging.info(f"Loaded Excel sheets: {list(dfs.keys())}")
     
     search_queries = {sheet: df['Артикул'].dropna().tolist() for sheet, df in dfs.items() if 'Артикул' in df.columns}
@@ -143,31 +130,29 @@ def main():
                     row.append(", ".join(prices) if prices else "Не найдено")
                 except Exception as e:
                     logging.error(f"Failed to scrape {target_url}{query}: {e}")
-                    
             final_data[sheet].append(row)
 
     merge_excel_files(
-        os.path.join(app.config['UPLOAD_FOLDER'], 'test.xlsx'),
+        excel_path,
         final_data,
         os.path.join(app.config['OUTPUT_FOLDER'], 'merged.xlsx'),
         target_urls
     )
     logging.info("Main function completed successfully")
 
-if __name__ == "__main__":
-    try:
-        main()
-    finally:
-        driver.quit()
-
+# Define target_urls BEFORE running main()
 target_urls = [
     "https://220volt.kz/search?query=",
     "https://elcentre.kz/site_search?search_term=",
     "https://intant.kz/catalog/?q=",
     "https://albion-group.kz/site_search?search_term=",
-    "https://volt.kz/#/search/"
+    "https://volt.kz/#/search/",
     "https://ekt.kz/catalog/?q=",
     "https://nur-electro.kz/search?controller=search&s=",
-    #"https://www.chipdip.kz/search?searchtext=",
-    #"https://barlau.kz/catalog/?q=",
 ]
+
+if __name__ == "__main__":
+    try:
+        main()
+    finally:
+        driver.quit()
